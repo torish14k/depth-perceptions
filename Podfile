@@ -13,7 +13,7 @@ pod 'MJRefresh'
 pod 'MBProgressHUD'
 pod 'DZNEmptyDataSet'
 pod 'FMDB'
-pod 'UMengAnalytics-NO-IDFA'
-pod 'UMengSocial' , '~>5.0'
+#pod 'UMengAnalytics-NO-IDFA'
+#pod 'UMengSocial' , '~>5.0'
 
 end

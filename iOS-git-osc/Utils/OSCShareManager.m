@@ -8,7 +8,7 @@
 
 #import "OSCShareManager.h"
 #import "Tools.h"
-#import "UMSocial.h"
+//#import "UMSocial.h"
 #import <MBProgressHUD.h>
 
 @import SafariServices;
@@ -150,160 +150,160 @@ static OSCShareManager* _shareManager ;
 - (IBAction)buttonAction:(id)sender {
     UIButton *button = (UIButton *)sender;
     UIViewController* curViewController = [self topViewControllerForViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
-	
-    UMSocialUrlResource* resource = nil;
-    if (self.resourceUrl && self.resourceUrl.length > 0) {
-        resource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:self.resourceUrl];
-    }
-    
-    switch (button.tag) {
-        case 1: //weibo
-        {
-            if (_isImage) {
-                [[UMSocialData defaultData].extConfig.sinaData.urlResource setResourceType:UMSocialUrlResourceTypeImage url:self.href];
-            }else{
-        
-               [[UMSocialData defaultData].extConfig.sinaData.urlResource setResourceType:UMSocialUrlResourceTypeDefault url:self.href];
-            }
-            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToSina]
-                                                               content:[NSString stringWithFormat:@"%@", self.descString]
-                                                                 image:self.logoImage
-                                                              location:nil
-                                                           urlResource:resource
-                                                   presentedController:curViewController
-                                                            completion:^(UMSocialResponseEntity *response) {
-                                                                if (response.responseCode == UMSResponseCodeSuccess) {
-                                                                    NSLog(@"分享成功");
-                                                                }
-                                                            }];
-            
-            break;
-        }
-        case 2: //Wechat Timeline
-        {
-            
-            if (_isImage) {
-                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeImage;
-            }else{
-                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
-            }
-            
-            [UMSocialData defaultData].extConfig.wechatSessionData.url = self.href;
-            [UMSocialData defaultData].extConfig.wechatTimelineData.url = self.href;
-            [UMSocialData defaultData].extConfig.title = self.title;
-            
-            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToWechatTimeline]
-                                                               content:[NSString stringWithFormat:@"%@", self.descString]
-                                                                 image:self.logoImage
-                                                              location:nil
-                                                           urlResource:resource
-                                                   presentedController:curViewController
-                                                            completion:^(UMSocialResponseEntity *response) {
-                                                                NSLog(@"%u",response.responseCode);
-                                                                if (response.responseCode == UMSResponseCodeSuccess) {
-                                                                    NSLog(@"分享成功");
-                                                                }
-                                                            }];
-            break;
-        }
-        case 3: //WechatSession
-        {
-            if (_isImage) {
-                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeImage;
-            }else{
-                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
-            }
-            [UMSocialData defaultData].extConfig.wechatSessionData.url = self.href;
-            [UMSocialData defaultData].extConfig.wechatSessionData.title = self.title;
-            
-            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToWechatSession]
-                                                               content:[NSString stringWithFormat:@"%@", self.descString]
-                                                                 image:self.logoImage
-                                                              location:nil
-                                                           urlResource:resource
-                                                   presentedController:curViewController
-                                                            completion:^(UMSocialResponseEntity *response) {
-                                                                if (response.responseCode == UMSResponseCodeSuccess) {
-                                                                    NSLog(@"分享成功");
-																}
-                                                            }];
-            
-            break;
-        }
-        case 4: //qq
-        {
-            if (_isImage) {
-                [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeImage;
-            }else{
-                [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeDefault;
-            }
-            [UMSocialData defaultData].extConfig.qqData.title = self.title;
-            [UMSocialData defaultData].extConfig.qqData.url = self.href;
-            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToQQ]
-                                                               content:[NSString stringWithFormat:@"%@", self.descString]
-                                                                 image:self.logoImage
-                                                              location:nil
-                                                           urlResource:resource
-                                                   presentedController:curViewController
-                                                            completion:^(UMSocialResponseEntity *response) {
-                                                                if (response.responseCode == UMSResponseCodeSuccess) {
-                                                                    NSLog(@"分享成功");
-                                                                }
-                                                            }];
-            
-            break;
-        }
-        case 5: //brower
-        {
-			
-			SFSafariViewController *safariVC = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:self.href]];
-			[self.window.rootViewController presentViewController:safariVC animated:YES completion:^{
-				//do nothing
-			}];
-			
-			if (self.superview) {
-				[self removeFromSuperview];
-			}
-			
-            break;
-        }
-        case 6: //copy url
-        {
-        
-            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-            pasteboard.string = [NSString stringWithFormat:@"%@", self.href];
-            
-            MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:[UIApplication sharedApplication].keyWindow];
-            
-            
-            [[UIApplication sharedApplication].keyWindow addSubview:HUD];
-            HUD.mode = MBProgressHUDModeCustomView;
-            HUD.labelText = @"已复制到剪切板";
-            [HUD show:YES];
-            [HUD hide:YES afterDelay:1];
-            if (self.superview) {
-                [self removeFromSuperview];
-            }
-            break;
-        }
-        case 7:  //more
-        {
-            if (self.superview) {
-                [self removeFromSuperview];
-            }
-            
-            UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSString stringWithFormat:@"%@ %@",self.title,self.href]] applicationActivities:nil];
-            if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
-                activityViewController.popoverPresentationController.sourceView = self;
-            }
-
-            [curViewController presentViewController:activityViewController animated:YES completion:nil];
-            
-            break;
-        }
-        default:
-            break;
-    }
+//	
+//    UMSocialUrlResource* resource = nil;
+//    if (self.resourceUrl && self.resourceUrl.length > 0) {
+//        resource = [[UMSocialUrlResource alloc] initWithSnsResourceType:UMSocialUrlResourceTypeImage url:self.resourceUrl];
+//    }
+//    
+//    switch (button.tag) {
+//        case 1: //weibo
+//        {
+//            if (_isImage) {
+//                [[UMSocialData defaultData].extConfig.sinaData.urlResource setResourceType:UMSocialUrlResourceTypeImage url:self.href];
+//            }else{
+//        
+//               [[UMSocialData defaultData].extConfig.sinaData.urlResource setResourceType:UMSocialUrlResourceTypeDefault url:self.href];
+//            }
+//            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToSina]
+//                                                               content:[NSString stringWithFormat:@"%@", self.descString]
+//                                                                 image:self.logoImage
+//                                                              location:nil
+//                                                           urlResource:resource
+//                                                   presentedController:curViewController
+//                                                            completion:^(UMSocialResponseEntity *response) {
+//                                                                if (response.responseCode == UMSResponseCodeSuccess) {
+//                                                                    NSLog(@"分享成功");
+//                                                                }
+//                                                            }];
+//            
+//            break;
+//        }
+//        case 2: //Wechat Timeline
+//        {
+//            
+//            if (_isImage) {
+//                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeImage;
+//            }else{
+//                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
+//            }
+//            
+//            [UMSocialData defaultData].extConfig.wechatSessionData.url = self.href;
+//            [UMSocialData defaultData].extConfig.wechatTimelineData.url = self.href;
+//            [UMSocialData defaultData].extConfig.title = self.title;
+//            
+//            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToWechatTimeline]
+//                                                               content:[NSString stringWithFormat:@"%@", self.descString]
+//                                                                 image:self.logoImage
+//                                                              location:nil
+//                                                           urlResource:resource
+//                                                   presentedController:curViewController
+//                                                            completion:^(UMSocialResponseEntity *response) {
+//                                                                NSLog(@"%u",response.responseCode);
+//                                                                if (response.responseCode == UMSResponseCodeSuccess) {
+//                                                                    NSLog(@"分享成功");
+//                                                                }
+//                                                            }];
+//            break;
+//        }
+//        case 3: //WechatSession
+//        {
+//            if (_isImage) {
+//                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeImage;
+//            }else{
+//                [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
+//            }
+//            [UMSocialData defaultData].extConfig.wechatSessionData.url = self.href;
+//            [UMSocialData defaultData].extConfig.wechatSessionData.title = self.title;
+//            
+//            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToWechatSession]
+//                                                               content:[NSString stringWithFormat:@"%@", self.descString]
+//                                                                 image:self.logoImage
+//                                                              location:nil
+//                                                           urlResource:resource
+//                                                   presentedController:curViewController
+//                                                            completion:^(UMSocialResponseEntity *response) {
+//                                                                if (response.responseCode == UMSResponseCodeSuccess) {
+//                                                                    NSLog(@"分享成功");
+//																}
+//                                                            }];
+//            
+//            break;
+//        }
+//        case 4: //qq
+//        {
+//            if (_isImage) {
+//                [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeImage;
+//            }else{
+//                [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeDefault;
+//            }
+//            [UMSocialData defaultData].extConfig.qqData.title = self.title;
+//            [UMSocialData defaultData].extConfig.qqData.url = self.href;
+//            [[UMSocialDataService defaultDataService] postSNSWithTypes:@[UMShareToQQ]
+//                                                               content:[NSString stringWithFormat:@"%@", self.descString]
+//                                                                 image:self.logoImage
+//                                                              location:nil
+//                                                           urlResource:resource
+//                                                   presentedController:curViewController
+//                                                            completion:^(UMSocialResponseEntity *response) {
+//                                                                if (response.responseCode == UMSResponseCodeSuccess) {
+//                                                                    NSLog(@"分享成功");
+//                                                                }
+//                                                            }];
+//            
+//            break;
+//        }
+//        case 5: //brower
+//        {
+//			
+//			SFSafariViewController *safariVC = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:self.href]];
+//			[self.window.rootViewController presentViewController:safariVC animated:YES completion:^{
+//				//do nothing
+//			}];
+//			
+//			if (self.superview) {
+//				[self removeFromSuperview];
+//			}
+//			
+//            break;
+//        }
+//        case 6: //copy url
+//        {
+//        
+//            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+//            pasteboard.string = [NSString stringWithFormat:@"%@", self.href];
+//            
+//            MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:[UIApplication sharedApplication].keyWindow];
+//            
+//            
+//            [[UIApplication sharedApplication].keyWindow addSubview:HUD];
+//            HUD.mode = MBProgressHUDModeCustomView;
+//            HUD.labelText = @"已复制到剪切板";
+//            [HUD show:YES];
+//            [HUD hide:YES afterDelay:1];
+//            if (self.superview) {
+//                [self removeFromSuperview];
+//            }
+//            break;
+//        }
+//        case 7:  //more
+//        {
+//            if (self.superview) {
+//                [self removeFromSuperview];
+//            }
+//            
+//            UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[[NSString stringWithFormat:@"%@ %@",self.title,self.href]] applicationActivities:nil];
+//            if ([activityViewController respondsToSelector:@selector(popoverPresentationController)]) {
+//                activityViewController.popoverPresentationController.sourceView = self;
+//            }
+//
+//            [curViewController presentViewController:activityViewController animated:YES completion:nil];
+//            
+//            break;
+//        }
+//        default:
+//            break;
+//    }
     
     
 }

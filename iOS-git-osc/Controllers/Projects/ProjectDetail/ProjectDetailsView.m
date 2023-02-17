@@ -18,7 +18,6 @@
 #import "ProjectNameCell.h"
 #import "UIView+Toast.h"
 #import "LoginViewController.h"
-#import "UMSocial.h"
 #import "TitleScrollViewController.h"
 #import "ProjectsCommitsViewController.h"
 #import "EventsView.h"
@@ -27,9 +26,10 @@
 #import "GITAPI.h"
 #import "AFHTTPRequestOperationManager+Util.h"
 #import "DataSetObject.h"
+#import <SafariServices/SafariServices.h>
+
 
 static NSString * const ProjectDetailsCellID = @"ProjectDetailsCell";
-//static NSString * const ProjcetDescriptionCellID = @"ProjcetDescriptionCell";
 
 @interface ProjectDetailsView () <UIActionSheetDelegate>
 
@@ -389,69 +389,42 @@ static NSString * const ProjectDetailsCellID = @"ProjectDetailsCell";
 
 - (void)moreChoice
 {
-//    [[[UIActionSheet alloc] initWithTitle:nil
-//                                 delegate:self
-//                        cancelButtonTitle:NSLocalizedString(@"取消", nil)
-//                   destructiveButtonTitle:nil
-//                        otherButtonTitles:NSLocalizedString(@"分享项目", nil), NSLocalizedString(@"复制链接", nil),NSLocalizedString(@"在浏览器中打开", nil), nil]
-//     
-//     showInView:self.view];
-    
-    
-    
-    OSCShareManager *shareM = [OSCShareManager shareManager];
-    
-    [shareM showShareBoardWithProjectM:_project URLStr:_projectURL image:[Tools getScreenshot:self.view]];
-    
+    [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:NSLocalizedString(@"取消", nil) destructiveButtonTitle:nil otherButtonTitles:NSLocalizedString(@"分享项目", nil), NSLocalizedString(@"复制链接", nil),NSLocalizedString(@"在浏览器中打开", nil), nil] showInView:self.view];
 }
 
 - (void)showShareView
 {
-    // 微信相关设置
-    
-    [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
-    [UMSocialData defaultData].extConfig.wechatSessionData.url = _projectURL;
-    [UMSocialData defaultData].extConfig.wechatTimelineData.url = _projectURL;
-    [UMSocialData defaultData].extConfig.title = _project.name;
-    
-    // 手机QQ相关设置
-    
-    [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeDefault;
-    [UMSocialData defaultData].extConfig.qqData.title = _project.name;
-    [UMSocialData defaultData].extConfig.qqData.url = _projectURL;
-    
-    // 新浪微博相关设置
-    
-    [[UMSocialData defaultData].extConfig.sinaData.urlResource setResourceType:UMSocialUrlResourceTypeDefault url:_projectURL];
-	
-	
-    [UMSocialSnsService presentSnsIconSheetView:self
-                                         appKey:@"54c9a412fd98c5779c000752"
-                                      shareText:[NSString stringWithFormat:@"我在关注%@的项目%@，你也来瞧瞧呗！%@", _project.owner.name, _project.name, _projectURL]
-                                     shareImage:[Tools getScreenshot:self.view]
-                                shareToSnsNames:@[
-                                                  UMShareToWechatSession, UMShareToWechatTimeline, UMShareToQQ, UMShareToSina //, UMShareToWechatFavorite
-                                                  ]
-                                       delegate:nil];
-	 
+	NSString *textToShare = [NSString stringWithString:_project.pathWithNamespace];
+	NSURL *urlShare = [NSURL URLWithString:_projectURL];
+	NSArray *activityItems = @[textToShare, urlShare];
+	UIActivityViewController *activityController=[[UIActivityViewController alloc]initWithActivityItems:activityItems applicationActivities:nil];
+	activityController.excludedActivityTypes = @[UIActivityTypeMessage,UIActivityTypePrint,UIActivityTypeSaveToCameraRoll,UIActivityTypeAddToReadingList,UIActivityTypePostToFlickr,UIActivityTypePostToVimeo,UIActivityTypeAirDrop];
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		activityController.popoverPresentationController.sourceView = self.view;
+		[self presentViewController:activityController animated:YES completion:nil];
+	} else {
+		[self presentViewController:activityController animated:YES completion:nil];
+	}
 }
 
 
 #pragma mark - UIActionSheetDelegate
 
-//- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-//    
-//    if (buttonIndex == actionSheet.cancelButtonIndex) {
-//        return;
-//    } else if (buttonIndex == 0) {
-//        [self showShareView];
-//    } else if (buttonIndex == 1) {
-//        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-//        pasteboard.string = _projectURL;
-//        [Tools toastNotification:@"链接已复制到剪贴板" inView:self.view];
-//    } else {
-//        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:_projectURL]];
-//    }
-//}
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    
+    if (buttonIndex == actionSheet.cancelButtonIndex) {
+        return;
+    } else if (buttonIndex == 0) {
+        [self showShareView];
+    } else if (buttonIndex == 1) {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        pasteboard.string = _projectURL;
+        [Tools toastNotification:@"链接已复制到剪贴板" inView:self.view];
+    } else {
+		SFSafariViewController *safariVC = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:_projectURL] entersReaderIfAvailable:YES];
+		safariVC.delegate = self;
+		[self presentViewController:safariVC animated:YES completion:nil];
+    }
+}
 
 @end

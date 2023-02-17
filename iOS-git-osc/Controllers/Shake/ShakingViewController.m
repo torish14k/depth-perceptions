@@ -15,7 +15,7 @@
 #import "Tools.h"
 #import "AwardView.h"
 #import "ReceivingInfoView.h"
-#import "UMSocial.h"
+//#import "UMSocial.h"
 
 #import <CoreMotion/CoreMotion.h>
 #import <AFNetworking.h>
@@ -416,35 +416,35 @@ static const double accelerationThreshold = 2.0f;
 {
     NSString *projectURL = [GITAPI_HTTPS_PREFIX componentsSeparatedByString:@"/api/v3/"][0];;
     
-    // 微信相关设置
-    
-    [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
-    
-    [UMSocialData defaultData].extConfig.wechatSessionData.url = projectURL;
-    [UMSocialData defaultData].extConfig.wechatTimelineData.url = projectURL;
-    
-    [UMSocialData defaultData].extConfig.title = @"摇到奖品啦！";
-    
-    // 手机QQ相关设置
-    
-    [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeDefault;
-    
-    [UMSocialData defaultData].extConfig.qqData.title = @"摇到奖品啦！";
-    
-    // 新浪微博相关设置
-    
-    [[UMSocialData defaultData].extConfig.sinaData.urlResource setResourceType:UMSocialUrlResourceTypeDefault url:projectURL];
-    
-    // 显示分享的平台icon
-    
-    [UMSocialSnsService presentSnsIconSheetView:self
-                                         appKey:@"5423cd47fd98c58f04000c52"
-                                      shareText:[NSString stringWithFormat:@"我在Git@OSC app上摇到了%@，你也来瞧瞧呗！%@", _project.message, projectURL]
-                                     shareImage:[Tools getScreenshot:self.view]
-                                shareToSnsNames:@[
-                                                  UMShareToWechatSession, UMShareToWechatTimeline, UMShareToQQ, UMShareToSina
-                                                  ]
-                                       delegate:nil];
+//    // 微信相关设置
+//    
+//    [UMSocialData defaultData].extConfig.wxMessageType = UMSocialWXMessageTypeWeb;
+//    
+//    [UMSocialData defaultData].extConfig.wechatSessionData.url = projectURL;
+//    [UMSocialData defaultData].extConfig.wechatTimelineData.url = projectURL;
+//    
+//    [UMSocialData defaultData].extConfig.title = @"摇到奖品啦！";
+//    
+//    // 手机QQ相关设置
+//    
+//    [UMSocialData defaultData].extConfig.qqData.qqMessageType = UMSocialQQMessageTypeDefault;
+//    
+//    [UMSocialData defaultData].extConfig.qqData.title = @"摇到奖品啦！";
+//    
+//    // 新浪微博相关设置
+//    
+//    [[UMSocialData defaultData].extConfig.sinaData.urlResource setResourceType:UMSocialUrlResourceTypeDefault url:projectURL];
+//    
+//    // 显示分享的平台icon
+//    
+//    [UMSocialSnsService presentSnsIconSheetView:self
+//                                         appKey:@"5423cd47fd98c58f04000c52"
+//                                      shareText:[NSString stringWithFormat:@"我在Git@OSC app上摇到了%@，你也来瞧瞧呗！%@", _project.message, projectURL]
+//                                     shareImage:[Tools getScreenshot:self.view]
+//                                shareToSnsNames:@[
+//                                                  UMShareToWechatSession, UMShareToWechatTimeline, UMShareToQQ, UMShareToSina
+//                                                  ]
+//                                       delegate:nil];
 }
 
 
